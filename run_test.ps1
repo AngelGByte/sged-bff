@@ -7,31 +7,38 @@ try {
   Write-Output 'POST /api/usuarios -> crear admin'
   $admin = @{nombre='Admin'; apellido='Colegio'; email='admin@colegio.cl'; password='admin123'; rol='ADMINISTRADOR'} | ConvertTo-Json
   try {
-    $respAdmin = Invoke-RestMethod -Uri "$baseUsers/api/usuarios" -Method Post -Body $admin -ContentType 'application/json'
-    Write-Output "Admin creado: $($respAdmin | ConvertTo-Json -Depth 3)"
+    $respAdmin = Invoke-WebRequest -Uri "$baseUsers/api/usuarios" -Method Post -Body $admin -ContentType 'application/json'
+    Write-Output "Admin creado: $($respAdmin.Content | ConvertFrom-Json | ConvertTo-Json -Depth 3)"
   } catch { Write-Output "Advertencia: no se pudo crear admin: $($_.Exception.Message)" }
 
   Write-Output 'POST /api/auth/login -> obtener token'
   $login = @{email='admin@colegio.cl'; password='admin123'} | ConvertTo-Json
-  $loginResp = Invoke-RestMethod -Uri "$baseUsers/api/auth/login" -Method Post -Body $login -ContentType 'application/json'
-  Write-Output "Login response: $($loginResp | ConvertTo-Json -Depth 3)"
-  if ($loginResp.token) { $token = $loginResp.token } elseif ($loginResp.accessToken) { $token = $loginResp.accessToken } elseif ($loginResp.data -and $loginResp.data.token) { $token = $loginResp.data.token } else { $token = $loginResp | Select-String -Pattern 'eyJ' -AllMatches | ForEach-Object { $_.Matches.Value } | Select-Object -First 1 }
+  $loginResp = Invoke-WebRequest -Uri "$baseUsers/api/auth/login" -Method Post -Body $login -ContentType 'application/json'
+  $loginData = $loginResp.Content | ConvertFrom-Json
+  Write-Output "Login response: $($loginData | ConvertTo-Json -Depth 3)"
+  if ($loginData.token) { $token = $loginData.token } elseif ($loginData.accessToken) { $token = $loginData.accessToken } elseif ($loginData.data -and $loginData.data.token) { $token = $loginData.data.token } else { $token = $loginData | Select-String -Pattern 'eyJ' -AllMatches | ForEach-Object { $_.Matches.Value } | Select-Object -First 1 }
   if (-not $token) { throw 'No se pudo obtener token de login' }
   Write-Output "Token obtenido: $($token.Substring(0,20) + '...')"
   $authHeader = @{ Authorization = "Bearer $token"; 'Content-Type' = 'application/json' }
 
+  $timestamp = (Get-Date).ToString('yyyyMMddHHmmss')
+  $docEmail = "docente-$timestamp@colegio.cl"
+  $cursoNombre = "1A-$timestamp"
+
   Write-Output 'POST /api/usuarios -> crear docente'
-  $doc = @{nombre='Maria'; apellido='Gonzalez'; email='docente@colegio.cl'; password='doc123'; rol='DOCENTE'} | ConvertTo-Json
+  $doc = @{nombre='Maria'; apellido='Gonzalez'; email=$docEmail; password='doc123'; rol='DOCENTE'} | ConvertTo-Json
   try {
-    $respDoc = Invoke-RestMethod -Uri "$baseUsers/api/usuarios" -Method Post -Body $doc -Headers $authHeader -ErrorAction Stop
-    Write-Output "Docente creado: $($respDoc | ConvertTo-Json -Depth 3)"
+    $respDoc = Invoke-WebRequest -Uri "$baseUsers/api/usuarios" -Method Post -Body $doc -Headers $authHeader -ContentType 'application/json' -ErrorAction Stop
+    $docData = $respDoc.Content | ConvertFrom-Json
+    Write-Output "Docente creado: $($docData | ConvertTo-Json -Depth 3)"
   } catch { Write-Output "Advertencia: no se pudo crear docente: $($_.Exception.Message)" }
 
   Write-Output 'POST /api/cursos -> crear curso'
-  $curso = @{nombre='1A'; nivel='1'; letra='A'; docenteJefeId=2; anio=2024} | ConvertTo-Json
+  $curso = @{nombre=$cursoNombre; nivel='1'; letra='A'; docenteJefeId=2; anio=2024} | ConvertTo-Json
   try {
-    $respCurso = Invoke-RestMethod -Uri "$baseCursos/api/cursos" -Method Post -Body $curso -Headers $authHeader -ContentType 'application/json' -ErrorAction Stop
-    Write-Output "Curso creado: $($respCurso | ConvertTo-Json -Depth 3)"
+    $respCurso = Invoke-WebRequest -Uri "$baseCursos/api/cursos" -Method Post -Body $curso -Headers $authHeader -ContentType 'application/json' -ErrorAction Stop
+    $cursoData = $respCurso.Content | ConvertFrom-Json
+    Write-Output "Curso creado: $($cursoData | ConvertTo-Json -Depth 3)"
   } catch { Write-Output "Advertencia: no se pudo crear curso: $($_.Exception.Message)" }
 
   Write-Output 'POST /api/notas -> registrar nota'
