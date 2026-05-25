@@ -4,21 +4,14 @@ import lombok.Data;
 import java.util.List;
 import java.util.Map;
 
-// PATRÓN: DTO agregado (Facade Pattern)
-// El BFF consolida respuestas de múltiples microservicios en un solo DTO
-// para que el frontend haga una sola petición.
-
 public class BffDTO {
 
-    // ── Auth ──────────────────────────────────────────────────────────────
     @Data
     public static class LoginRequest {
         private String email;
         private String password;
     }
 
-    // ── Dashboard del Docente ─────────────────────────────────────────────
-    // Agrega: usuario + cursos asignados + últimas notas ingresadas
     @Data
     public static class DashboardDocente {
         private Object usuario;
@@ -26,8 +19,6 @@ public class BffDTO {
         private List<Object> ultimasNotas;
     }
 
-    // ── Dashboard del Estudiante ──────────────────────────────────────────
-    // Agrega: usuario + notas + resumen asistencia + anotaciones
     @Data
     public static class DashboardEstudiante {
         private Object usuario;
@@ -36,8 +27,6 @@ public class BffDTO {
         private List<Object> anotaciones;
     }
 
-    // ── Hoja de Vida Consolidada ──────────────────────────────────────────
-    // Agrega: info del estudiante + notas + anotaciones + asistencia
     @Data
     public static class HojaVidaEstudiante {
         private Object datosPersonales;
@@ -47,7 +36,6 @@ public class BffDTO {
         private Map<String, Double> promediosPorAsignatura;
     }
 
-    // ── Respuesta genérica de error ───────────────────────────────────────
     @Data
     public static class ErrorResponse {
         private String mensaje;

@@ -1,0 +1,14 @@
+cl\duocuc\sged\bff\config\WebClientConfig.class
+cl\duocuc\sged\bff\dto\BffDTO$DashboardDocente.class
+cl\duocuc\sged\bff\dto\BffDTO.class
+cl\duocuc\sged\bff\dto\BffDTO$DashboardEstudiante.class
+cl\duocuc\sged\bff\dto\BffDTO$HojaVidaEstudiante.class
+cl\duocuc\sged\bff\config\JwtAuthFilter.class
+cl\duocuc\sged\bff\config\BffSecurityConfig.class
+cl\duocuc\sged\bff\service\BffService.class
+cl\duocuc\sged\bff\dto\BffDTO$LoginRequest.class
+cl\duocuc\sged\bff\config\BffSwaggerConfig.class
+cl\duocuc\sged\bff\config\JwtUtil.class
+cl\duocuc\sged\bff\SgedBffApplication.class
+cl\duocuc\sged\bff\dto\BffDTO$ErrorResponse.class
+cl\duocuc\sged\bff\controller\BffController.class

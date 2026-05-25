@@ -12,9 +12,6 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 
-// PATRÓN: Facade + DTO
-// Centraliza todas las llamadas a microservicios.
-// El frontend llama a UN solo endpoint del BFF y recibe datos consolidados.
 @Service
 public class BffService {
 
@@ -30,7 +27,6 @@ public class BffService {
     @Qualifier("webClientCursos")
     private WebClient webClientCursos;
 
-    // ── LOGIN: delega al ms-usuarios ──────────────────────────────────────
     public Object login(BffDTO.LoginRequest request) {
         return webClientUsuarios.post()
                 .uri("/api/auth/login")
@@ -40,7 +36,6 @@ public class BffService {
                 .block();
     }
 
-    // ── DASHBOARD DOCENTE: agrega usuario + cursos ────────────────────────
     public BffDTO.DashboardDocente dashboardDocente(Long docenteId, String token) {
         Object usuario = getUsuario(docenteId, token);
         List<Object> cursos = getCursos(token);
@@ -52,7 +47,6 @@ public class BffService {
         return dashboard;
     }
 
-    // ── DASHBOARD ESTUDIANTE: agrega notas + asistencia + anotaciones ─────
     public BffDTO.DashboardEstudiante dashboardEstudiante(Long estudianteId, String token) {
         Object usuario = getUsuario(estudianteId, token);
         List<Object> notas = getNotasEstudiante(estudianteId, token);
@@ -67,7 +61,6 @@ public class BffService {
         return dashboard;
     }
 
-    // ── HOJA DE VIDA: vista consolidada por estudiante ────────────────────
     public BffDTO.HojaVidaEstudiante hojaVida(Long estudianteId, String token) {
         Object datosPersonales = getUsuario(estudianteId, token);
         List<Object> notas = getNotasEstudiante(estudianteId, token);
@@ -82,8 +75,6 @@ public class BffService {
         hoja.setPromediosPorAsignatura(Map.of()); // se puede enriquecer con calls adicionales
         return hoja;
     }
-
-    // ── HELPERS INTERNOS ──────────────────────────────────────────────────
 
     private Object getUsuario(Long id, String token) {
         return webClientUsuarios.get()
